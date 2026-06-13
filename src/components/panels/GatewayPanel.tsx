@@ -44,9 +44,15 @@ export function GatewayPanel({ nodeId }: { nodeId: string }) {
     <div className="space-y-3">
       <Field label={`Routing Rules (${cfg.rules.length})`}>
         {availableTargets.length === 0 && (
-          <p className="text-[10px] text-yellow-400/60 font-mono">
-            Connect this gateway to services first
-          </p>
+          <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-2.5 text-[10px] text-yellow-400/70 font-mono leading-relaxed">
+            ← Draw an edge from this gateway to a downstream node first
+          </div>
+        )}
+        {availableTargets.length > 0 && cfg.rules.length === 0 && (
+          <div className="rounded-lg border border-red-500/25 bg-red-500/5 p-2.5 space-y-1">
+            <p className="text-[10px] text-red-400/80 font-semibold">No routing rules</p>
+            <p className="text-[10px] text-white/40 leading-relaxed">Every incoming request will be dropped. Add at least one rule to forward traffic.</p>
+          </div>
         )}
 
         <div className="space-y-2">

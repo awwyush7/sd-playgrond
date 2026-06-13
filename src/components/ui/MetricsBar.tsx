@@ -74,15 +74,29 @@ export function MetricsBar() {
   )
 }
 
+const STAT_TIPS: Record<string, string> = {
+  RPS: 'Requests per second processed by this node in the last second',
+  ERR: 'Percentage of requests that resulted in an error',
+  P99: '99th percentile latency — the slowest 1% of requests. SLAs are often written as "P99 < 200ms"',
+  Q:   'Queue depth — requests currently waiting to be processed. Sustained Q > 0 means the node is a bottleneck',
+}
+
 function Stat({
   label, value, isError, isWarn,
 }: { label: string; value: string | number; isError?: boolean; isWarn?: boolean }) {
   return (
-    <div className="flex items-baseline gap-1">
-      <span className="text-[8px] text-white/25 font-mono uppercase">{label}</span>
+    <div className="flex items-baseline gap-1 group relative cursor-default">
+      <span className="text-[8px] text-white/25 font-mono uppercase underline decoration-dotted decoration-white/15 group-hover:text-white/45 transition-colors">{label}</span>
       <span className={`text-[9px] font-mono font-medium ${isError ? 'text-red-400' : isWarn ? 'text-orange-400' : 'text-white/55'}`}>
         {value}
       </span>
+      {STAT_TIPS[label] && (
+        <div className="absolute bottom-full left-0 mb-1.5 w-48 bg-[#1a1a2e] border border-white/10 rounded-lg px-2.5 py-2 text-[9px] text-white/55 leading-relaxed shadow-xl z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <span className="font-mono font-bold text-white/40 uppercase tracking-wider text-[8px]">{label}</span>
+          <br />
+          {STAT_TIPS[label]}
+        </div>
+      )}
     </div>
   )
 }

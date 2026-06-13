@@ -229,7 +229,25 @@ export const useGraphStore = create<GraphStore>()(
           style: { stroke: 'rgba(255,255,255,0.18)', strokeWidth: 1.5 },
         }
         const edges = [...state.edges, edge]
-        return { edges, ...runValidation(state.nodes, edges) }
+
+        // Auto-add a catch-all routing rule when a gateway gets its first outgoing edge
+        let nodes = state.nodes
+        const sourceNode = nodes.find(n => n.id === connection.source)
+        if (sourceNode?.data.nodeType === 'gateway') {
+          const cfg = sourceNode.data.config as GatewayConfig
+          const hasNoRulesForTarget = !cfg.rules.some(r => r.targetNodeId === connection.target)
+          if (cfg.rules.length === 0 && hasNoRulesForTarget) {
+            const newRule = { id: nanoid(6), method: 'GET' as const, pathPrefix: '/api', targetNodeId: connection.target }
+            const updatedCfg: GatewayConfig = { ...cfg, rules: [newRule] }
+            nodes = nodes.map(n =>
+              n.id === connection.source
+                ? { ...n, data: { ...n.data, config: updatedCfg as NodeConfig } }
+                : n
+            )
+          }
+        }
+
+        return { nodes, edges, ...runValidation(nodes, edges) }
       })
     },
 

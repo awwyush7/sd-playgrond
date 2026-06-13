@@ -130,9 +130,9 @@ export function Toolbar() {
           <ChevronIcon />
         </Btn>
         {templateDD.open && (
-          <div className="absolute top-full left-0 mt-1.5 w-64 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
-            <p className="text-[9px] text-white/30 uppercase tracking-widest font-mono px-3 pt-2.5 pb-1">Quick Start</p>
-            {TEMPLATES.map(t => (
+          <div className="absolute top-full left-0 mt-1.5 w-72 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+            <p className="text-[9px] text-white/30 uppercase tracking-widest font-mono px-3 pt-2.5 pb-1">Architectures</p>
+            {TEMPLATES.filter(t => t.badge !== 'Scenario').map(t => (
               <button
                 key={t.id}
                 onClick={() => {
@@ -156,6 +156,28 @@ export function Toolbar() {
                 </div>
               </button>
             ))}
+            <div className="border-t border-white/[0.06] mt-1">
+              <p className="text-[9px] text-white/30 uppercase tracking-widest font-mono px-3 pt-2.5 pb-1">Failure Scenarios</p>
+              {TEMPLATES.filter(t => t.badge === 'Scenario').map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    if (isActive) stopSimulation()
+                    loadTemplate(t.id)
+                    templateDD.setOpen(false)
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-white/[0.05] transition-colors flex items-start gap-2.5"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[12px] text-white/80 font-medium">{t.name}</span>
+                      <span className="text-[8px] px-1.5 py-0.5 rounded font-mono uppercase tracking-wide bg-orange-500/15 text-orange-400">{t.badge}</span>
+                    </div>
+                    <p className="text-[10px] text-white/35 font-mono mt-0.5 truncate">{t.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>

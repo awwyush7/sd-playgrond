@@ -27,6 +27,18 @@ export const TEMPLATES: Template[] = [
     description: 'Two independent services with separate databases',
     badge: 'Advanced',
   },
+  {
+    id: 'db-overload',
+    name: 'DB Overload',
+    description: 'High RPS saturates a small connection pool — watch the queue grow',
+    badge: 'Scenario',
+  },
+  {
+    id: 'cache-effect',
+    name: 'Cache Effect',
+    description: 'Same load with a cache layer — DB queue drops from 50+ to near zero',
+    badge: 'Scenario',
+  },
 ]
 
 function getStore() {
@@ -189,10 +201,99 @@ function loadMicroservices() {
   updateNodeConfig(prodDbId,    { nodeType: 'database', queryLatencyMs: 25, connectionPoolSize: 15, maxThroughput: 150 })
 }
 
+// ─── Scenario: DB Overload ─────────────────────────────────────────────────────
+// High RPS + tiny connection pool → queue depth climbs rapidly.
+// Teaching moment: watch Q in MetricsBar climb on the DB node.
+function loadDbOverload() {
+  const { resetGraph, addNode, onConnect, updateNodeConfig, updateNodeLabel } = getStore()
+  resetGraph()
+
+  const clientId  = addNode('client',  { x: 60,  y: 200 })
+  const gatewayId = addNode('gateway', { x: 300, y: 200 })
+  const svcId     = addNode('service', { x: 540, y: 200 })
+  const dbId      = addNode('database', { x: 780, y: 200 })
+
+  updateNodeLabel(clientId,  'Heavy Client')
+  updateNodeLabel(gatewayId, 'API Gateway')
+  updateNodeLabel(svcId,     'App Service')
+  updateNodeLabel(dbId,      'Postgres (tiny pool)')
+
+  onConnect({ source: clientId,  target: gatewayId, sourceHandle: null, targetHandle: null })
+  onConnect({ source: gatewayId, target: svcId,     sourceHandle: null, targetHandle: null })
+  onConnect({ source: svcId,     target: dbId,      sourceHandle: null, targetHandle: null })
+
+  updateNodeConfig(gatewayId, {
+    nodeType: 'gateway',
+    rules: [{ id: nanoid(6), method: 'GET', pathPrefix: '/api', targetNodeId: svcId }],
+  })
+  updateNodeConfig(clientId, {
+    nodeType: 'client',
+    // High RPS to saturate the tiny DB pool
+    routes: [{ id: nanoid(6), method: 'GET', path: '/api/data', rps: 80 }],
+  })
+  updateNodeConfig(svcId, { nodeType: 'service', latencyMs: 10, errorRate: 0 })
+  updateNodeConfig(dbId, {
+    nodeType: 'database',
+    queryLatencyMs: 40,
+    // 3 connections = bottleneck at ~75 RPS throughput
+    connectionPoolSize: 3,
+    maxThroughput: 500,
+  })
+}
+
+// ─── Scenario: Cache Effect ────────────────────────────────────────────────────
+// Same load, but a cache intercepts 85% of reads → DB Q drops to near zero.
+// Teaching moment: remove the cache node and watch DB Q spike back up.
+function loadCacheEffect() {
+  const { resetGraph, addNode, onConnect, updateNodeConfig, updateNodeLabel } = getStore()
+  resetGraph()
+
+  const clientId  = addNode('client',   { x: 60,  y: 200 })
+  const gatewayId = addNode('gateway',  { x: 300, y: 200 })
+  const svcId     = addNode('service',  { x: 540, y: 200 })
+  const cacheId   = addNode('cache',    { x: 780, y: 200 })
+  const dbId      = addNode('database', { x: 1020, y: 200 })
+
+  updateNodeLabel(clientId,  'Heavy Client')
+  updateNodeLabel(gatewayId, 'API Gateway')
+  updateNodeLabel(svcId,     'App Service')
+  updateNodeLabel(cacheId,   'Redis (85% hit)')
+  updateNodeLabel(dbId,      'Postgres (tiny pool)')
+
+  onConnect({ source: clientId,  target: gatewayId, sourceHandle: null, targetHandle: null })
+  onConnect({ source: gatewayId, target: svcId,     sourceHandle: null, targetHandle: null })
+  onConnect({ source: svcId,     target: cacheId,   sourceHandle: null, targetHandle: null })
+  onConnect({ source: cacheId,   target: dbId,      sourceHandle: null, targetHandle: null })
+
+  updateNodeConfig(gatewayId, {
+    nodeType: 'gateway',
+    rules: [{ id: nanoid(6), method: 'GET', pathPrefix: '/api', targetNodeId: svcId }],
+  })
+  updateNodeConfig(clientId, {
+    nodeType: 'client',
+    routes: [{ id: nanoid(6), method: 'GET', path: '/api/data', rps: 80 }],
+  })
+  updateNodeConfig(svcId, { nodeType: 'service', latencyMs: 10, errorRate: 0 })
+  updateNodeConfig(cacheId, {
+    nodeType: 'cache',
+    hitRate: 85,
+    hitLatencyMs: 2,
+    missLatencyMs: 8,
+  })
+  updateNodeConfig(dbId, {
+    nodeType: 'database',
+    queryLatencyMs: 40,
+    connectionPoolSize: 3,
+    maxThroughput: 500,
+  })
+}
+
 export function loadTemplate(templateId: string) {
   switch (templateId) {
     case 'three-tier':      return loadThreeTier()
     case 'load-balanced':   return loadLoadBalanced()
     case 'microservices':   return loadMicroservices()
+    case 'db-overload':     return loadDbOverload()
+    case 'cache-effect':    return loadCacheEffect()
   }
 }

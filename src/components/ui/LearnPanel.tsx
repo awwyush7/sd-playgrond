@@ -136,16 +136,6 @@ export function LearnPanel({ nodeType }: Props) {
         </div>
       </Section>
 
-      {/* Teaser for paid advanced topics */}
-      <div className="rounded-xl border border-dashed border-white/[0.08] p-3 flex items-start gap-2">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2" className="flex-shrink-0 mt-0.5">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-          <path d="M7 11V7a5 5 0 0110 0v4" />
-        </svg>
-        <p className="text-[9px] text-white/25 leading-relaxed">
-          Advanced topics — Kafka, streaming, read replicas, rate limiting, db sharding — coming in Pro.
-        </p>
-      </div>
     </div>
   )
 }
