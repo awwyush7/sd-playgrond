@@ -150,7 +150,7 @@ export interface ValidationError {
 // ─── Route Result (returned by router.ts) ───────────────────────────────────
 
 export type RouteResult =
-  | { outcome: 'forwarded'; targetNodeId: string; edgeId: string; decision: string; latencyMs: 0 }
+  | { outcome: 'forwarded'; targetNodeId: string; edgeId: string; decision: string; latencyMs: number }
   | { outcome: 'dropped'; reason: string; latencyMs: 0 }
   | { outcome: 'processed'; latencyMs: number; decision: string }
   | { outcome: 'error'; latencyMs: number; decision: string }

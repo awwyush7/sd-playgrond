@@ -1,5 +1,5 @@
 import type { NodeProps } from '@xyflow/react'
-import type { AppNodeData, LoadBalancerConfig } from '../../types'
+import type { AppNode, LoadBalancerConfig } from '../../types'
 import { useGraphStore, EMPTY_ERRORS } from '../../stores/graphStore'
 import { BaseNode } from './BaseNode'
 
@@ -12,7 +12,7 @@ const LBIcon = () => (
   </svg>
 )
 
-export function LoadBalancerNode({ id, data, selected }: NodeProps<AppNodeData>) {
+export function LoadBalancerNode({ id, data, selected }: NodeProps<AppNode>) {
   const validationErrors = useGraphStore(s => s.validationErrorsByNodeId.get(id) ?? EMPTY_ERRORS)
   const edges = useGraphStore(s => s.edges)
   const cfg = data.config as LoadBalancerConfig

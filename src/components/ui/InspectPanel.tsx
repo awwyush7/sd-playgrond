@@ -106,7 +106,7 @@ export function InspectPanel() {
 
       {/* Step dots */}
       <div className="flex items-center gap-1 px-4 pb-2">
-        {trace.map((s, i) => (
+        {trace.map((_s, i) => (
           <button
             key={i}
             onClick={() => {

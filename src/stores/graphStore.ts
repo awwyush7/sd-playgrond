@@ -23,7 +23,7 @@ import { serializeGraph, deserializeGraph } from '../utils/urlShare'
 
 // Stable empty array — used as default when a node has no errors
 // (avoids new [] on every selector call, which would cause infinite re-renders)
-export const EMPTY_ERRORS: ValidationError[] = Object.freeze([]) as ValidationError[]
+export const EMPTY_ERRORS: ValidationError[] = Object.freeze([] as ValidationError[]) as ValidationError[]
 
 function buildErrorMap(errors: ValidationError[]): Map<string, ValidationError[]> {
   const map = new Map<string, ValidationError[]>()

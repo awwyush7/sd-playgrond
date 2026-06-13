@@ -1,5 +1,5 @@
 import type { NodeProps } from '@xyflow/react'
-import type { AppNodeData, DatabaseConfig } from '../../types'
+import type { AppNode, DatabaseConfig } from '../../types'
 import { useGraphStore, EMPTY_ERRORS } from '../../stores/graphStore'
 import { BaseNode } from './BaseNode'
 
@@ -12,7 +12,7 @@ const DBIcon = () => (
   </svg>
 )
 
-export function DatabaseNode({ id, data, selected }: NodeProps<AppNodeData>) {
+export function DatabaseNode({ id, data, selected }: NodeProps<AppNode>) {
   const validationErrors = useGraphStore(s => s.validationErrorsByNodeId.get(id) ?? EMPTY_ERRORS)
   const cfg = data.config as DatabaseConfig
 

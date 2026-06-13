@@ -107,6 +107,7 @@ export function createSimulationTick(
     const speed = getSimSpeed()
     const nodeMap = new Map(nodes.map(n => [n.id, n]))
     const nextPackets: Map<string, Packet> = new Map(packets)
+    const newThisTick = new Set<string>()
 
     // 1. GENERATE packets from clients
     for (const node of nodes) {
@@ -150,12 +151,14 @@ export function createSimulationTick(
           totalDropped++
           recordEvent(node.id, 0, true)
         }
+        newThisTick.add(packet.id)
         nextPackets.set(packet.id, packet)
       }
     }
 
-    // 2. ADVANCE in-flight packets
+    // 2. ADVANCE in-flight packets (skip packets generated this same tick)
     for (const [id, packet] of nextPackets) {
+      if (newThisTick.has(id)) continue
       if (packet.status !== 'in-flight') continue
 
       const destNode = nodeMap.get(packet.currentNodeId)

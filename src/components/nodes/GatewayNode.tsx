@@ -1,5 +1,5 @@
 import type { NodeProps } from '@xyflow/react'
-import type { AppNodeData, GatewayConfig } from '../../types'
+import type { AppNode, GatewayConfig } from '../../types'
 import { useGraphStore, EMPTY_ERRORS } from '../../stores/graphStore'
 import { BaseNode } from './BaseNode'
 
@@ -10,7 +10,7 @@ const GatewayIcon = () => (
   </svg>
 )
 
-export function GatewayNode({ id, data, selected }: NodeProps<AppNodeData>) {
+export function GatewayNode({ id, data, selected }: NodeProps<AppNode>) {
   const validationErrors = useGraphStore(s => s.validationErrorsByNodeId.get(id) ?? EMPTY_ERRORS)
   const cfg = data.config as GatewayConfig
   const ruleCount = cfg.rules.length

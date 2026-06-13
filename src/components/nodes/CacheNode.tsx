@@ -1,5 +1,5 @@
 import type { NodeProps } from '@xyflow/react'
-import type { AppNodeData, CacheConfig } from '../../types'
+import type { AppNode, CacheConfig } from '../../types'
 import { useGraphStore, EMPTY_ERRORS } from '../../stores/graphStore'
 import { BaseNode } from './BaseNode'
 
@@ -11,7 +11,7 @@ const CacheIcon = () => (
   </svg>
 )
 
-export function CacheNode({ id, data, selected }: NodeProps<AppNodeData>) {
+export function CacheNode({ id, data, selected }: NodeProps<AppNode>) {
   const validationErrors = useGraphStore(s => s.validationErrorsByNodeId.get(id) ?? EMPTY_ERRORS)
   const cfg = data.config as CacheConfig
 

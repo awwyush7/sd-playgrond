@@ -15,16 +15,19 @@ export function buildTrace(
   }
 
   const cfg = clientNode.data.config as ClientConfig
+  const now = Date.now()
   const packet = {
     id: nanoid(6),
     sourceNodeId: clientNodeId,
     currentNodeId: clientNodeId,
     currentEdgeId: null as string | null,
     progress: 0,
+    transitMs: 0,
+    transitStartTime: now,
     status: 'in-flight' as const,
     method: cfg.method,
     path: cfg.path,
-    startTime: Date.now(),
+    startTime: now,
     completedAt: null,
     hops: [],
   }
