@@ -62,9 +62,7 @@ export function loadDemoGraph() {
   // Configure client
   updateNodeConfig(clientId, {
     nodeType: 'client',
-    rps: 10,
-    method: 'GET',
-    path: '/api/users',
+    routes: [{ id: nanoid(6), method: 'GET', path: '/api/users', rps: 10 }],
   })
 
   // Configure services

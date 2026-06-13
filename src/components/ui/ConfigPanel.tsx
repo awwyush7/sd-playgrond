@@ -102,20 +102,29 @@ export function ConfigPanel() {
         )}
       </div>
 
-      {/* ── Validation errors ───────────────────────────────────────── */}
+      {/* ── Validation errors + architectural hints ─────────────────── */}
       {validationErrors.length > 0 && (
         <div className="border-t border-white/[0.06] px-3 py-2 space-y-1.5 flex-shrink-0">
-          {validationErrors.map(err => (
-            <div
-              key={err.id}
-              className={`flex items-start gap-1.5 text-[10px] font-mono ${
-                err.type === 'error' ? 'text-red-400/75' : 'text-yellow-400/65'
-              }`}
-            >
-              <span className="flex-shrink-0 mt-px">{err.type === 'error' ? '✗' : '⚠'}</span>
-              <span className="leading-relaxed">{err.message}</span>
-            </div>
-          ))}
+          {validationErrors.map(err => {
+            const isHint = err.hint === true
+            return (
+              <div
+                key={err.id}
+                className={`flex items-start gap-1.5 text-[10px] font-mono ${
+                  err.type === 'error'
+                    ? 'text-red-400/75'
+                    : isHint
+                      ? 'text-amber-400/50'
+                      : 'text-yellow-400/65'
+                }`}
+              >
+                <span className="flex-shrink-0 mt-px">
+                  {err.type === 'error' ? '✗' : isHint ? '💡' : '⚠'}
+                </span>
+                <span className="leading-relaxed">{err.message}</span>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

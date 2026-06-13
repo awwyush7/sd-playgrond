@@ -15,6 +15,7 @@ export function buildTrace(
   }
 
   const cfg = clientNode.data.config as ClientConfig
+  const firstRoute = cfg.routes?.[0] ?? { method: 'GET' as const, path: '/api' }
   const now = Date.now()
   const packet = {
     id: nanoid(6),
@@ -25,8 +26,8 @@ export function buildTrace(
     transitMs: 0,
     transitStartTime: now,
     status: 'in-flight' as const,
-    method: cfg.method,
-    path: cfg.path,
+    method: firstRoute.method,
+    path: firstRoute.path,
     startTime: now,
     completedAt: null,
     hops: [],

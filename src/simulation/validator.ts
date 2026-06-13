@@ -118,7 +118,59 @@ export function validateGraph(nodes: AppNode[], edges: AppEdge[]): ValidationErr
     }
   }
 
+  errors.push(...checkArchitecturalPatterns(nodes, edges))
+
   return errors
+}
+
+// Non-blocking architectural hints — never prevent simulation, purely educational
+function checkArchitecturalPatterns(nodes: AppNode[], edges: AppEdge[]): ValidationError[] {
+  const hints: ValidationError[] = []
+  const nodeMap = new Map(nodes.map(n => [n.id, n]))
+
+  for (const edge of edges) {
+    const src = nodeMap.get(edge.source)
+    const tgt = nodeMap.get(edge.target)
+    if (!src || !tgt) continue
+
+    const s = src.data.nodeType
+    const t = tgt.data.nodeType
+
+    if (s === 'gateway' && t === 'database') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Gateway → Database direct: no service layer means raw DB calls per request. Add a Service for business logic + connection pooling.' })
+    }
+    if (s === 'gateway' && t === 'cache') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Gateway → Cache direct: caches are read-aside layers, not request processors. Route through a Service first.' })
+    }
+    if ((s === 'load-balancer') && t === 'cache') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Load Balancer → Cache: LBs should distribute to Services. Caches are typically behind services, not directly load-balanced.' })
+    }
+    if ((s === 'load-balancer') && t === 'database') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Load Balancer → Database direct: bypasses service + cache layers. All requests hit DB at full load.' })
+    }
+    if (s === 'database') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Database has an outgoing edge — DBs are terminal nodes. This edge will never carry traffic.' })
+    }
+    if (s === 'client' && t === 'service') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Client → Service directly: no API Gateway means no routing, auth, or rate limiting. Fine for simple prototypes.' })
+    }
+    if (s === 'client' && t === 'database') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Client → Database directly: never expose your DB to clients. In production this is a critical security risk.' })
+    }
+    if (s === 'client' && t === 'cache') {
+      hints.push({ id: nanoid(6), type: 'warning', hint: true, nodeId: src.id,
+        message: 'Client → Cache directly: caches should sit between services and databases, not between clients and services.' })
+    }
+  }
+
+  return hints
 }
 
 function dfs(

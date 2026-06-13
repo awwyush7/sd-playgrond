@@ -27,19 +27,22 @@ export function ClientNode({ id, data, selected }: NodeProps<AppNode>) {
       hasSource={true}
     >
       <div className="flex flex-col gap-0.5">
-        <InfoRow label="RPS" value={cfg.rps} />
-        <InfoRow label="Method" value={cfg.method} />
-        <InfoRow label="Path" value={cfg.path} />
+        {(cfg.routes ?? []).slice(0, 3).map(r => (
+          <div key={r.id} className="flex items-center gap-1">
+            <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-white/[0.06] text-white/50 flex-shrink-0">{r.method}</span>
+            <span className="text-[9px] text-white/55 font-mono truncate flex-1">{r.path}</span>
+            <span className="text-[8px] text-white/35 font-mono flex-shrink-0">{r.rps}/s</span>
+          </div>
+        ))}
+        {(cfg.routes ?? []).length > 3 && (
+          <span className="text-[8px] text-white/25 font-mono">+{cfg.routes.length - 3} more</span>
+        )}
+        <div className="flex items-center justify-between mt-0.5 pt-0.5 border-t border-white/[0.06]">
+          <span className="text-[8px] text-white/25 font-mono">Total</span>
+          <span className="text-[9px] text-white/55 font-mono">{(cfg.routes ?? []).reduce((s, r) => s + (r.rps ?? 0), 0)}/s</span>
+        </div>
       </div>
     </BaseNode>
   )
 }
 
-function InfoRow({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="flex items-center justify-between gap-2">
-      <span className="text-[10px] text-white/40 font-mono">{label}</span>
-      <span className="text-[10px] text-white/70 font-mono truncate max-w-[70px]">{value}</span>
-    </div>
-  )
-}

@@ -8,7 +8,6 @@ import type {
   ServiceConfig,
   CacheConfig,
   DatabaseConfig,
-  ClientConfig,
 } from '../types'
 
 // Seeded PRNG for deterministic inspect mode
@@ -47,7 +46,6 @@ export function routeRequest(
 
   switch (node.data.nodeType) {
     case 'client': {
-      const cfg = node.data.config as ClientConfig
       const edge = outgoing[0]
       if (!edge) {
         return { outcome: 'dropped', reason: 'Client has no outgoing connection', latencyMs: 0 }
@@ -56,7 +54,7 @@ export function routeRequest(
         outcome: 'forwarded',
         targetNodeId: edge.target,
         edgeId: edge.id,
-        decision: `Client → ${cfg.method} ${cfg.path}`,
+        decision: `Client → ${packet.method} ${packet.path}`,
         latencyMs: 0,
       }
     }

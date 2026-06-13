@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useSimulationStore } from '../../stores/simulationStore'
-import type { Packet } from '../../types'
+import type { Packet, PacketStatus } from '../../types'
 
-const STATUS_COLOR: Record<Packet['status'], string> = {
+const STATUS_COLOR: Record<PacketStatus, string> = {
   pending: '#94a3b8',
   'in-flight': '#22C55E',
   completed: '#22C55E',
@@ -10,16 +10,27 @@ const STATUS_COLOR: Record<Packet['status'], string> = {
   dropped: '#F97316',
 }
 
+// Colors for terminal burst rings
+const BURST_COLOR: Partial<Record<PacketStatus, string>> = {
+  completed: '#22C55E',
+  failed:    '#EF4444',
+  dropped:   '#F97316',
+}
+
+const BURST_DURATION = 700  // ms
+
 type Point = { x: number; y: number }
+interface Burst { pos: Point; color: string; startTime: number }
 
 export function PacketOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animFrameRef = useRef<number>(0)
   const packetsRef = useRef<Map<string, Packet>>(new Map())
+  const prevStatusRef = useRef<Map<string, PacketStatus>>(new Map())
+  const burstsRef = useRef<Burst[]>([])
 
   const packets = useSimulationStore(s => s.packets)
 
-  // Keep ref current without restarting the animation loop
   useEffect(() => {
     packetsRef.current = packets
   }, [packets])
@@ -45,7 +56,6 @@ export function PacketOverlay() {
     const ro = new ResizeObserver(resizeCanvas)
     if (canvas.parentElement) ro.observe(canvas.parentElement)
 
-    // Use getScreenCTM() to correctly map SVG user-space → screen → canvas pixels
     function getEdgePoint(edgeId: string, t: number): Point | null {
       const pathEl = canvas?.parentElement?.querySelector<SVGPathElement>(
         `.react-flow__edge[data-id="${edgeId}"] .react-flow__edge-path`
@@ -60,13 +70,8 @@ export function PacketOverlay() {
         const screenPt = svgPt.matrixTransform(ctm)
         const cr = canvas!.getBoundingClientRect()
         const dpr = window.devicePixelRatio
-        return {
-          x: (screenPt.x - cr.left) * dpr,
-          y: (screenPt.y - cr.top) * dpr,
-        }
-      } catch {
-        return null
-      }
+        return { x: (screenPt.x - cr.left) * dpr, y: (screenPt.y - cr.top) * dpr }
+      } catch { return null }
     }
 
     function getNodeCenter(nodeId: string): Point | null {
@@ -88,23 +93,40 @@ export function PacketOverlay() {
       const r = 4.5 * dpr
       ctx.save()
       ctx.globalAlpha = alpha
-
-      // Outer glow
       ctx.shadowColor = color
       ctx.shadowBlur = 10 * dpr
       ctx.fillStyle = color
       ctx.beginPath()
       ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2)
       ctx.fill()
-
-      // Bright core
       ctx.shadowBlur = 0
       ctx.fillStyle = '#ffffff'
       ctx.globalAlpha = alpha * 0.9
       ctx.beginPath()
       ctx.arc(pos.x, pos.y, r * 0.38, 0, Math.PI * 2)
       ctx.fill()
+      ctx.restore()
+    }
 
+    function drawBurst(ctx: CanvasRenderingContext2D, burst: Burst, now: number) {
+      const dpr = window.devicePixelRatio
+      const age = now - burst.startTime
+      const progress = age / BURST_DURATION  // 0→1
+      if (progress >= 1) return
+
+      const alpha = Math.max(0, 1 - progress)
+      const baseR = 5 * dpr
+      const r = baseR * (1 + progress * 4)  // expand from 5px to 25px
+
+      ctx.save()
+      ctx.globalAlpha = alpha * 0.7
+      ctx.strokeStyle = burst.color
+      ctx.lineWidth = 1.5 * dpr * (1 - progress * 0.5)
+      ctx.shadowColor = burst.color
+      ctx.shadowBlur = 8 * dpr * (1 - progress)
+      ctx.beginPath()
+      ctx.arc(burst.pos.x, burst.pos.y, r, 0, Math.PI * 2)
+      ctx.stroke()
       ctx.restore()
     }
 
@@ -114,6 +136,28 @@ export function PacketOverlay() {
 
       const now = Date.now()
 
+      // Detect newly terminal packets → spawn burst
+      for (const [id, packet] of packetsRef.current) {
+        const prev = prevStatusRef.current.get(id)
+        if (
+          prev === 'in-flight' &&
+          (packet.status === 'completed' || packet.status === 'failed' || packet.status === 'dropped')
+        ) {
+          const pos = getNodeCenter(packet.currentNodeId)
+          const color = BURST_COLOR[packet.status] ?? '#94a3b8'
+          if (pos) burstsRef.current.push({ pos, color, startTime: now })
+        }
+      }
+      // Update previous status snapshot
+      const newPrev = new Map<string, PacketStatus>()
+      for (const [id, p] of packetsRef.current) newPrev.set(id, p.status)
+      prevStatusRef.current = newPrev
+
+      // Draw + prune bursts
+      burstsRef.current = burstsRef.current.filter(b => now - b.startTime < BURST_DURATION)
+      for (const burst of burstsRef.current) drawBurst(ctx, burst, now)
+
+      // Draw in-flight / failed / dropped dots
       for (const packet of packetsRef.current.values()) {
         if (packet.status === 'pending' || packet.status === 'completed') continue
 
@@ -122,19 +166,14 @@ export function PacketOverlay() {
         let alpha = 1.0
 
         if (packet.status === 'in-flight' && packet.currentEdgeId) {
-          // Wall-clock interpolation: smooth regardless of tick rate
           const elapsed = now - packet.transitStartTime
           const t = elapsed / Math.max(1, packet.transitMs)
           pos = getEdgePoint(packet.currentEdgeId, t)
         }
 
-        if (!pos && packet.currentNodeId) {
-          pos = getNodeCenter(packet.currentNodeId)
-        }
-
+        if (!pos && packet.currentNodeId) pos = getNodeCenter(packet.currentNodeId)
         if (!pos) continue
 
-        // Fade out terminal packets
         if (packet.status === 'failed' || packet.status === 'dropped') {
           const age = packet.completedAt ? now - packet.completedAt : 0
           alpha = Math.max(0, 1 - age / 600)
@@ -153,7 +192,7 @@ export function PacketOverlay() {
       cancelAnimationFrame(animFrameRef.current)
       ro.disconnect()
     }
-  }, []) // single long-running loop — positions are recalculated from DOM every frame
+  }, [])
 
   return (
     <canvas

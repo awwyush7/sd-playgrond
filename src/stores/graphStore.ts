@@ -45,7 +45,7 @@ function runValidation(nodes: AppNode[], edges: AppEdge[]) {
 function defaultConfig(nodeType: NodeType): NodeConfig {
   switch (nodeType) {
     case 'client':
-      return { nodeType: 'client', rps: 5, method: 'GET', path: '/api' }
+      return { nodeType: 'client', routes: [{ id: nanoid(6), method: 'GET', path: '/api', rps: 5 }] }
     case 'gateway':
       return { nodeType: 'gateway', rules: [] }
     case 'load-balancer':

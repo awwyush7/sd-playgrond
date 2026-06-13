@@ -38,11 +38,16 @@ export interface RoutingRule {
   targetNodeId: string
 }
 
-export interface ClientConfig {
-  nodeType: 'client'
-  rps: number
+export interface RouteEntry {
+  id: string
   method: HttpMethod
   path: string
+  rps: number  // requests per second for this specific route
+}
+
+export interface ClientConfig {
+  nodeType: 'client'
+  routes: RouteEntry[]  // total RPS = sum of route RPS values
 }
 
 export interface GatewayConfig {
@@ -142,6 +147,7 @@ export interface TraceStep {
 export interface ValidationError {
   id: string
   type: 'error' | 'warning'
+  hint?: boolean   // true = architectural hint, rendered differently than a structural warning
   nodeId?: string
   edgeId?: string
   message: string

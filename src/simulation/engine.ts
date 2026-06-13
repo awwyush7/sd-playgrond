@@ -57,6 +57,8 @@ export function createSimulationTick(
   const metrics: Map<string, NodeMetrics> = new Map()
   // Stored as flat triplets: [timestamp, latencyMs, isError(0|1), ...]
   const recentEvents: Map<string, number[]> = new Map()
+  // Token bucket: accumulated fractional credits per route (key = nodeId:routeId)
+  const routeCredits = new Map<string, number>()
   let totalCompleted = 0
   let totalDropped = 0
 
@@ -113,46 +115,56 @@ export function createSimulationTick(
     for (const node of nodes) {
       if (node.data.nodeType !== 'client') continue
       const cfg = node.data.config as ClientConfig
-      const count = Math.max(1, Math.round(cfg.rps / 10))
+      if (!cfg.routes || cfg.routes.length === 0) continue
 
-      for (let i = 0; i < count; i++) {
-        const packet: Packet = {
-          id: nanoid(8),
-          sourceNodeId: node.id,
-          currentNodeId: node.id,
-          currentEdgeId: null,
-          progress: 0,
-          transitMs: 0,
-          transitStartTime: now,
-          status: 'pending',
-          method: cfg.method,
-          path: cfg.path,
-          startTime: now,
-          completedAt: null,
-          hops: [],
-        }
+      // Token bucket: each route accumulates credits at route.rps/10 per tick,
+      // emitting exactly floor(credits) packets and carrying the fractional remainder.
+      // This gives stable exact RPS with no Bernoulli variance.
+      for (const route of cfg.routes) {
+        const key = `${node.id}:${route.id}`
+        const credits = (routeCredits.get(key) ?? 0) + route.rps / 10
+        const count = Math.floor(credits)
+        routeCredits.set(key, credits - count)  // carry fractional remainder
+        if (count === 0) continue
 
-        const result = routeRequest(packet, node, edges, nodes)
-        if (result.outcome === 'forwarded') {
-          const targetNode = nodeMap.get(result.targetNodeId)
-          const tMs = targetNode ? getTransitMs(targetNode, speed) : 300
-          packet.currentEdgeId = result.edgeId
-          packet.currentNodeId = result.targetNodeId
-          packet.status = 'in-flight'
-          packet.progress = 0
-          packet.transitMs = tMs
-          packet.transitStartTime = now
-          addInFlight(result.targetNodeId)
-          // Record client emit as a throughput event
-          recordEvent(node.id, 0, false)
-        } else {
-          packet.status = 'dropped'
-          packet.completedAt = now
-          totalDropped++
-          recordEvent(node.id, 0, true)
+        for (let i = 0; i < count; i++) {
+          const packet: Packet = {
+            id: nanoid(8),
+            sourceNodeId: node.id,
+            currentNodeId: node.id,
+            currentEdgeId: null,
+            progress: 0,
+            transitMs: 0,
+            transitStartTime: now,
+            status: 'pending',
+            method: route.method,
+            path: route.path,
+            startTime: now,
+            completedAt: null,
+            hops: [],
+          }
+
+          const result = routeRequest(packet, node, edges, nodes)
+          if (result.outcome === 'forwarded') {
+            const targetNode = nodeMap.get(result.targetNodeId)
+            const tMs = targetNode ? getTransitMs(targetNode, speed) : 300
+            packet.currentEdgeId = result.edgeId
+            packet.currentNodeId = result.targetNodeId
+            packet.status = 'in-flight'
+            packet.progress = 0
+            packet.transitMs = tMs
+            packet.transitStartTime = now
+            addInFlight(result.targetNodeId)
+            recordEvent(node.id, 0, false)
+          } else {
+            packet.status = 'dropped'
+            packet.completedAt = now
+            totalDropped++
+            recordEvent(node.id, 0, true)
+          }
+          newThisTick.add(packet.id)
+          nextPackets.set(packet.id, packet)
         }
-        newThisTick.add(packet.id)
-        nextPackets.set(packet.id, packet)
       }
     }
 
@@ -236,7 +248,7 @@ export function createSimulationTick(
 
           case 'error':
             nextPackets.set(id, { ...base, status: 'failed', completedAt: now, currentEdgeId: null })
-            totalCompleted++ // errors count as served (just failed)
+            totalDropped++
             break
 
           case 'dropped':
