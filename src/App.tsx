@@ -199,7 +199,6 @@ function Canvas() {
         maxZoom={2.5}
         defaultEdgeOptions={{
           type: 'default',
-          style: { stroke: 'var(--edge-stroke)', strokeWidth: 1.5 },
           animated: false,
         }}
         proOptions={{ hideAttribution: true }}

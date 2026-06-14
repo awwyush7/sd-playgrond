@@ -37,8 +37,8 @@
   --node-bg:       rgba(255, 255, 255, 0.82);
   --node-border:   rgba(0, 0, 0, 0.09);
   --handle-bg:     #e2e2ee;
-  --edge-stroke:   rgba(0, 0, 0, 0.38);
-  --edge-hover:    rgba(0, 0, 0, 0.60);
+  --edge-stroke:   rgba(0, 0, 0, 0.50);
+  --edge-hover:    rgba(0, 0, 0, 0.75);
   --scrollbar:     rgba(0, 0, 0, 0.09);
 }
 
@@ -82,15 +82,17 @@ html, body, #root {
 .react-flow__background { background: transparent; }
 .react-flow__pane { cursor: default; }
 
+/* Force edge color via CSS so it always wins over inline styles baked into edge data */
 .react-flow__edge-path {
-  stroke: var(--edge-stroke);
-  stroke-width: 1.5;
+  stroke: var(--edge-stroke) !important;
+  stroke-width: 1.5 !important;
   transition: stroke 0.15s;
+  fill: none !important;
 }
 
 .react-flow__edge.selected .react-flow__edge-path,
 .react-flow__edge:hover .react-flow__edge-path {
-  stroke: var(--edge-hover);
+  stroke: var(--edge-hover) !important;
 }
 
 .react-flow__edge--highlighted .react-flow__edge-path {
