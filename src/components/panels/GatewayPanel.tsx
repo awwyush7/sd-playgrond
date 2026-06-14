@@ -14,7 +14,6 @@ export function GatewayPanel({ nodeId }: { nodeId: string }) {
   if (!node || node.data.nodeType !== 'gateway') return null
   const cfg = node.data.config as GatewayConfig
 
-  // Only show nodes that are reachable via outgoing edges
   const outgoingTargetIds = edges.filter(e => e.source === nodeId).map(e => e.target)
   const availableTargets = allNodes.filter(n => outgoingTargetIds.includes(n.id))
 
@@ -51,7 +50,7 @@ export function GatewayPanel({ nodeId }: { nodeId: string }) {
         {availableTargets.length > 0 && cfg.rules.length === 0 && (
           <div className="rounded-lg border border-red-500/25 bg-red-500/5 p-2.5 space-y-1">
             <p className="text-[10px] text-red-400/80 font-semibold">No routing rules</p>
-            <p className="text-[10px] text-white/40 leading-relaxed">Every incoming request will be dropped. Add at least one rule to forward traffic.</p>
+            <p className="text-[10px] text-2 leading-relaxed">Every incoming request will be dropped. Add at least one rule to forward traffic.</p>
           </div>
         )}
 
@@ -62,17 +61,17 @@ export function GatewayPanel({ nodeId }: { nodeId: string }) {
               <div
                 key={rule.id}
                 className={`rounded-lg border p-2 space-y-1.5 ${
-                  targetConnected ? 'border-white/10 bg-white/[0.02]' : 'border-red-500/30 bg-red-500/5'
+                  targetConnected ? 'border-ui bg-field' : 'border-red-500/30 bg-red-500/5'
                 }`}
               >
                 <div className="flex gap-1.5">
                   <select
                     value={rule.method}
                     onChange={e => updateRule(rule.id, { method: e.target.value as HttpMethod })}
-                    className="bg-white/5 border border-white/10 rounded px-1.5 py-1 text-[10px] font-mono text-violet-300 focus:outline-none focus:border-white/30 flex-shrink-0"
+                    className="bg-field border border-ui rounded px-1.5 py-1 text-[10px] font-mono text-violet-400 focus:outline-none focus:border-[var(--text-3)] flex-shrink-0"
                   >
                     {METHODS.map(m => (
-                      <option key={m} value={m} className="bg-[#1a1a24]">{m}</option>
+                      <option key={m} value={m}>{m}</option>
                     ))}
                   </select>
 
@@ -84,7 +83,7 @@ export function GatewayPanel({ nodeId }: { nodeId: string }) {
 
                   <button
                     onClick={() => removeRule(rule.id)}
-                    className="text-white/30 hover:text-red-400 transition-colors text-xs flex-shrink-0"
+                    className="text-3 hover:text-red-400 transition-colors text-xs flex-shrink-0"
                     title="Remove rule"
                   >
                     ✕
@@ -92,19 +91,19 @@ export function GatewayPanel({ nodeId }: { nodeId: string }) {
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] text-white/30 font-mono flex-shrink-0">→</span>
+                  <span className="text-[9px] text-3 font-mono flex-shrink-0">→</span>
                   <select
                     value={rule.targetNodeId}
                     onChange={e => updateRule(rule.id, { targetNodeId: e.target.value })}
-                    className="flex-1 bg-white/5 border border-white/10 rounded px-1.5 py-1 text-[10px] font-mono text-white/70 focus:outline-none focus:border-white/30"
+                    className="flex-1 bg-field border border-ui rounded px-1.5 py-1 text-[10px] font-mono text-2 focus:outline-none focus:border-[var(--text-3)]"
                   >
                     {availableTargets.map(t => (
-                      <option key={t.id} value={t.id} className="bg-[#1a1a24]">
+                      <option key={t.id} value={t.id}>
                         {t.data.label}
                       </option>
                     ))}
                     {!targetConnected && (
-                      <option value={rule.targetNodeId} className="bg-[#1a1a24] text-red-400">
+                      <option value={rule.targetNodeId} className="text-red-400">
                         {rule.targetNodeId} (not connected)
                       </option>
                     )}
@@ -118,7 +117,7 @@ export function GatewayPanel({ nodeId }: { nodeId: string }) {
         <button
           onClick={addRule}
           disabled={availableTargets.length === 0}
-          className="w-full mt-1 py-1.5 rounded-lg border border-dashed border-white/20 text-[10px] text-white/40 hover:border-violet-400/40 hover:text-violet-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-full mt-1 py-1.5 rounded-lg border border-dashed border-ui text-[10px] text-3 hover:border-violet-400/40 hover:text-violet-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           + Add Rule
         </button>

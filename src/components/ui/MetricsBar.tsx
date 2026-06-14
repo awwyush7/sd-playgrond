@@ -20,7 +20,6 @@ export function MetricsBar() {
 
   if (status === 'idle') return null
 
-  // Detect bottleneck: node with highest P99 latency
   let bottleneckId: string | null = null
   let maxP99 = 0
   for (const node of nodes) {
@@ -29,7 +28,7 @@ export function MetricsBar() {
   }
 
   return (
-    <div className="flex items-stretch border-t border-white/[0.06] overflow-x-auto flex-shrink-0 h-[68px] bg-[#080810]">
+    <div className="flex items-stretch border-t border-ui overflow-x-auto flex-shrink-0 h-[68px] bg-base">
       {nodes.map(node => {
         const m     = metrics.get(node.id)
         const color = NODE_COLOR[node.data.nodeType]
@@ -42,18 +41,17 @@ export function MetricsBar() {
         return (
           <div
             key={node.id}
-            className="flex flex-col justify-center px-3 min-w-[110px] border-r border-white/[0.04] hover:bg-white/[0.02] transition-colors relative flex-shrink-0"
+            className="flex flex-col justify-center px-3 min-w-[110px] border-r border-soft hover:bg-lift transition-colors relative flex-shrink-0"
             title={isBottleneck ? `⚠ Bottleneck: highest P99 in the graph` : undefined}
           >
-            {/* Top accent bar — orange for bottleneck */}
             <div
               className="absolute top-0 left-0 right-0 h-[2px] transition-colors"
               style={{ background: isBottleneck ? '#F97316' : color }}
             />
             {isBottleneck && (
-              <div className="absolute top-1 right-1.5 w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" title="Bottleneck" />
+              <div className="absolute top-1 right-1.5 w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
             )}
-            <p className="text-[9px] font-semibold text-white/50 truncate mb-1">{node.data.label}</p>
+            <p className="text-[9px] font-semibold text-2 truncate mb-1">{node.data.label}</p>
             <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
               <Stat label="RPS" value={rps} />
               <Stat label="ERR" value={`${err.toFixed(0)}%`} isError={err > 0} />
@@ -64,10 +62,10 @@ export function MetricsBar() {
         )
       })}
 
-      {/* Global counters — sticky right */}
-      <div className="ml-auto flex items-center gap-5 px-5 border-l border-white/[0.06] flex-shrink-0">
+      {/* Global counters */}
+      <div className="ml-auto flex items-center gap-5 px-5 border-l border-ui flex-shrink-0">
         <GlobalCounter label="Completed" value={completedCount} color="#22C55E" symbol="✓" />
-        <div className="w-px h-7 bg-white/[0.06]" />
+        <div className="w-px h-7 bg-[var(--border)]" />
         <GlobalCounter label="Dropped"   value={droppedCount}   color="#F97316" symbol="✕" />
       </div>
     </div>
@@ -86,13 +84,13 @@ function Stat({
 }: { label: string; value: string | number; isError?: boolean; isWarn?: boolean }) {
   return (
     <div className="flex items-baseline gap-1 group relative cursor-default">
-      <span className="text-[8px] text-white/25 font-mono uppercase underline decoration-dotted decoration-white/15 group-hover:text-white/45 transition-colors">{label}</span>
-      <span className={`text-[9px] font-mono font-medium ${isError ? 'text-red-400' : isWarn ? 'text-orange-400' : 'text-white/55'}`}>
+      <span className="text-[8px] text-3 font-mono uppercase underline decoration-dotted decoration-[var(--text-3)] group-hover:text-2 transition-colors">{label}</span>
+      <span className={`text-[9px] font-mono font-medium ${isError ? 'text-red-400' : isWarn ? 'text-orange-400' : 'text-2'}`}>
         {value}
       </span>
       {STAT_TIPS[label] && (
-        <div className="absolute bottom-full left-0 mb-1.5 w-48 bg-[#1a1a2e] border border-white/10 rounded-lg px-2.5 py-2 text-[9px] text-white/55 leading-relaxed shadow-xl z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <span className="font-mono font-bold text-white/40 uppercase tracking-wider text-[8px]">{label}</span>
+        <div className="absolute bottom-full left-0 mb-1.5 w-48 bg-elevated border border-ui rounded-lg px-2.5 py-2 text-[9px] text-2 leading-relaxed shadow-xl z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <span className="font-mono font-bold text-3 uppercase tracking-wider text-[8px]">{label}</span>
           <br />
           {STAT_TIPS[label]}
         </div>
@@ -112,7 +110,7 @@ function GlobalCounter({ label, value, color, symbol }: {
           {value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value}
         </span>
       </div>
-      <span className="text-[8px] text-white/30 font-mono uppercase tracking-wide">{label}</span>
+      <span className="text-[8px] text-3 font-mono uppercase tracking-wide">{label}</span>
     </div>
   )
 }

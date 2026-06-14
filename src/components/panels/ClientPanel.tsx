@@ -41,26 +41,24 @@ export function ClientPanel({ nodeId }: { nodeId: string }) {
 
   return (
     <div className="space-y-3">
-      {/* Total RPS — computed, read-only */}
       <div className="flex items-center justify-between px-1">
-        <span className="text-[10px] text-white/40 uppercase tracking-wide font-mono">Total RPS</span>
-        <span className="text-[13px] font-bold font-mono text-white/70">{totalRps}</span>
+        <span className="text-[10px] text-3 uppercase tracking-wide font-mono">Total RPS</span>
+        <span className="text-[13px] font-bold font-mono text-1">{totalRps}</span>
       </div>
 
       <Field label={`Routes (${cfg.routes.length})`}>
         <div className="space-y-1.5">
           {cfg.routes.map(route => (
-            <div key={route.id} className="rounded-lg border border-white/[0.07] bg-white/[0.03] p-2 space-y-1.5">
-              {/* Method + Path row */}
+            <div key={route.id} className="rounded-lg border border-ui node-bg p-2 space-y-1.5">
               <div className="flex items-center gap-1.5">
                 <select
                   value={route.method}
                   onChange={e => updateRoute(route.id, { method: e.target.value as HttpMethod })}
-                  className="bg-white/5 border border-white/10 rounded px-1.5 py-1 text-[10px] font-mono focus:outline-none focus:border-white/30 flex-shrink-0"
+                  className="bg-field border border-ui rounded px-1.5 py-1 text-[10px] font-mono focus:outline-none focus:border-[var(--text-3)] flex-shrink-0"
                   style={{ color: METHOD_TEXT[route.method] }}
                 >
                   {METHODS.map(m => (
-                    <option key={m} value={m} className="bg-[#1a1a24] text-white">{m}</option>
+                    <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
                 <TextInput
@@ -72,16 +70,15 @@ export function ClientPanel({ nodeId }: { nodeId: string }) {
                 {cfg.routes.length > 1 && (
                   <button
                     onClick={() => removeRoute(route.id)}
-                    className="text-white/20 hover:text-red-400/70 transition-colors text-[11px] font-mono flex-shrink-0 px-0.5"
+                    className="text-3 hover:text-red-400/70 transition-colors text-[11px] font-mono flex-shrink-0 px-0.5"
                     title="Remove route"
                   >
                     ✕
                   </button>
                 )}
               </div>
-              {/* RPS row */}
               <div className="flex items-center gap-2">
-                <span className="text-[9px] text-white/30 font-mono">RPS</span>
+                <span className="text-[9px] text-3 font-mono">RPS</span>
                 <NumberInput
                   key={`rps-${route.id}`}
                   defaultValue={route.rps}
@@ -89,18 +86,17 @@ export function ClientPanel({ nodeId }: { nodeId: string }) {
                   max={200}
                   onCommit={v => updateRoute(route.id, { rps: Math.min(200, Math.max(1, v)) })}
                 />
-                <span className="text-[9px] text-white/25 font-mono whitespace-nowrap">
+                <span className="text-[9px] text-3 font-mono whitespace-nowrap">
                   {totalRps > 0 ? `${Math.round((route.rps / totalRps) * 100)}%` : '—'}
                 </span>
               </div>
             </div>
           ))}
 
-          {/* Add route button */}
           <button
             onClick={addRoute}
             disabled={cfg.routes.length >= 6}
-            className="w-full py-1 text-[10px] font-mono text-white/30 hover:text-white/55 border border-dashed border-white/[0.08] hover:border-white/20 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full py-1 text-[10px] font-mono text-3 hover:text-2 border border-dashed border-ui hover:border-[var(--text-3)] rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
             + Add route
           </button>
@@ -115,7 +111,7 @@ export function ClientPanel({ nodeId }: { nodeId: string }) {
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] text-white/40 uppercase tracking-wide font-mono">{label}</label>
+      <label className="text-[10px] text-3 uppercase tracking-wide font-mono">{label}</label>
       {children}
     </div>
   )
@@ -145,7 +141,7 @@ export function NumberInput({
         if (!isNaN(v)) onCommit(v)
       }}
       onKeyDown={e => { if (e.key === 'Enter') ref.current?.blur() }}
-      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-xs text-white/80 font-mono focus:outline-none focus:border-white/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+      className="w-full bg-field border border-ui rounded-md px-2 py-1.5 text-xs text-1 font-mono focus:outline-none focus:border-[var(--text-3)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
     />
   )
 }
@@ -168,7 +164,7 @@ export function TextInput({
       placeholder={placeholder}
       onBlur={() => { if (ref.current) onCommit(ref.current.value) }}
       onKeyDown={e => { if (e.key === 'Enter') ref.current?.blur() }}
-      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-xs text-white/80 font-mono focus:outline-none focus:border-white/30 placeholder:text-white/20"
+      className="w-full bg-field border border-ui rounded-md px-2 py-1.5 text-xs text-1 font-mono focus:outline-none focus:border-[var(--text-3)] placeholder:text-3"
     />
   )
 }

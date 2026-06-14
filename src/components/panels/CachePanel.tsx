@@ -23,13 +23,13 @@ export function CachePanel({ nodeId }: { nodeId: string }) {
           onCommit={v => update({ hitRate: Math.min(100, Math.max(0, v)) })}
         />
         <div className="flex items-center gap-2 mt-1">
-          <div className="h-1.5 flex-1 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-1.5 flex-1 rounded-full bg-elevated overflow-hidden">
             <div
               className="h-full rounded-full bg-emerald-400/60 transition-all"
               style={{ width: `${cfg.hitRate}%` }}
             />
           </div>
-          <span className="text-[10px] text-white/40 font-mono w-8">{cfg.hitRate}%</span>
+          <span className="text-[10px] text-3 font-mono w-8">{cfg.hitRate}%</span>
         </div>
       </Field>
 

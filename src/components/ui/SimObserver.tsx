@@ -29,7 +29,6 @@ function buildObservations(
     obs.push({ kind: 'warn', text: `${Math.round(droppedCount / total * 100)}% of requests are dropped — check your gateway routing rules or load balancer connections.` })
   }
 
-  // Bottleneck: highest P99
   let maxP99 = 0
   let bottleneckLabel = ''
   for (const [nodeId, m] of nodeMetrics) {
@@ -42,7 +41,6 @@ function buildObservations(
     obs.push({ kind: 'warn', text: `P99 latency is ${maxP99}ms — 1 in 100 users waits over ${maxP99}ms. The orange dot in the MetricsBar marks your bottleneck.` })
   }
 
-  // Good states
   const allQueuesLow = nodeMetrics.every(([, m]) => m.queueDepth < 3)
   const allErrorsLow = nodeMetrics.every(([, m]) => m.errorRate < 2)
   if (allQueuesLow && allErrorsLow && completedCount > 50) {
@@ -53,13 +51,13 @@ function buildObservations(
 }
 
 const KIND_STYLES = {
-  info: 'border-white/10 bg-white/[0.04] text-white/50',
+  info: 'border-ui bg-lift text-2',
   warn: 'border-orange-500/25 bg-orange-500/[0.06] text-orange-300/80',
   good: 'border-emerald-500/25 bg-emerald-500/[0.06] text-emerald-300/70',
 }
 
 const KIND_DOT = {
-  info: 'bg-white/30',
+  info: 'bg-[var(--text-3)]',
   warn: 'bg-orange-400',
   good: 'bg-emerald-400',
 }

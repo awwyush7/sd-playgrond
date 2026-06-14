@@ -34,14 +34,14 @@ import { loadTemplate } from './utils/templates'
 import type { NodeType, AppNode, AppEdge } from './types'
 
 const STARTER_TEMPLATES = [
-  { id: 'three-tier',   name: '3-Tier Web App', badge: 'Beginner',     badgeColor: 'text-emerald-400 bg-emerald-500/10', desc: 'Client → Gateway → Service → DB' },
-  { id: 'load-balanced',name: 'Load Balanced',  badge: 'Intermediate', badgeColor: 'text-blue-400 bg-blue-500/10',       desc: 'Two services + Redis cache' },
-  { id: 'microservices',name: 'Microservices',  badge: 'Advanced',     badgeColor: 'text-violet-400 bg-violet-500/10',   desc: 'Auth + Product, separate DBs' },
+  { id: 'three-tier',    name: '3-Tier Web App', badge: 'Beginner',     badgeColor: 'text-emerald-400 bg-emerald-500/10', desc: 'Client → Gateway → Service → DB' },
+  { id: 'load-balanced', name: 'Load Balanced',  badge: 'Intermediate', badgeColor: 'text-blue-400 bg-blue-500/10',       desc: 'Two services + Redis cache' },
+  { id: 'microservices', name: 'Microservices',  badge: 'Advanced',     badgeColor: 'text-violet-400 bg-violet-500/10',   desc: 'Auth + Product, separate DBs' },
 ]
 
 const SCENARIO_TEMPLATES = [
-  { id: 'db-overload',  name: 'DB Overload',   badge: 'Scenario', badgeColor: 'text-orange-400 bg-orange-500/10', desc: 'Watch Q spike as pool saturates' },
-  { id: 'cache-effect', name: 'Cache Effect',  badge: 'Scenario', badgeColor: 'text-orange-400 bg-orange-500/10', desc: 'Cache drops DB load by 85%' },
+  { id: 'db-overload',  name: 'DB Overload',  badge: 'Scenario', badgeColor: 'text-orange-400 bg-orange-500/10', desc: 'Watch Q spike as pool saturates' },
+  { id: 'cache-effect', name: 'Cache Effect', badge: 'Scenario', badgeColor: 'text-orange-400 bg-orange-500/10', desc: 'Cache drops DB load by 85%' },
 ]
 
 function TemplateCard({ id, name, badge, badgeColor, desc }: typeof STARTER_TEMPLATES[0]) {
@@ -51,12 +51,12 @@ function TemplateCard({ id, name, badge, badgeColor, desc }: typeof STARTER_TEMP
       onClick={() => loadTemplate(id)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="w-[155px] text-left rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/[0.16] transition-all duration-150 p-3 flex flex-col gap-1.5"
+      className="w-[155px] text-left rounded-xl border border-ui node-bg hover:bg-lift hover:border-[var(--node-border)] transition-all duration-150 p-3 flex flex-col gap-1.5"
       style={{ transform: hovered ? 'translateY(-2px)' : 'none' }}
     >
       <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded self-start ${badgeColor}`}>{badge}</span>
-      <p className="text-[12px] font-semibold text-white/75">{name}</p>
-      <p className="text-[10px] text-white/35 font-mono leading-relaxed">{desc}</p>
+      <p className="text-[12px] font-semibold text-1">{name}</p>
+      <p className="text-[10px] text-3 font-mono leading-relaxed">{desc}</p>
     </button>
   )
 }
@@ -65,31 +65,30 @@ function EmptyState() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 select-none">
       <div className="text-center">
-        <p className="text-[11px] text-white/20 font-mono uppercase tracking-widest mb-1">System Design Playground</p>
-        <p className="text-[22px] font-bold text-white/70 leading-tight">Watch distributed systems come alive.</p>
-        <p className="text-[13px] text-white/30 mt-1">Wire nodes, configure routes, run a simulation — see how real architectures behave.</p>
+        <p className="text-[11px] text-3 font-mono uppercase tracking-widest mb-1">System Design Playground</p>
+        <p className="text-[22px] font-bold text-1 leading-tight">Watch distributed systems come alive.</p>
+        <p className="text-[13px] text-2 mt-1">Wire nodes, configure routes, run a simulation — see how real architectures behave.</p>
       </div>
 
       <div className="flex flex-col items-center gap-2">
-        <p className="text-[9px] text-white/20 uppercase tracking-widest font-mono">Start with a template</p>
+        <p className="text-[9px] text-3 uppercase tracking-widest font-mono">Start with a template</p>
         <div className="flex items-stretch gap-2.5">
           {STARTER_TEMPLATES.map(t => <TemplateCard key={t.id} {...t} />)}
         </div>
       </div>
 
       <div className="flex flex-col items-center gap-2">
-        <p className="text-[9px] text-white/15 uppercase tracking-widest font-mono">or try a failure scenario</p>
+        <p className="text-[9px] text-3 uppercase tracking-widest font-mono">or try a failure scenario</p>
         <div className="flex items-stretch gap-2.5">
           {SCENARIO_TEMPLATES.map(t => <TemplateCard key={t.id} {...t} />)}
         </div>
       </div>
 
-      <p className="text-[10px] text-white/12 font-mono">or drag any component from the left sidebar to start from scratch</p>
+      <p className="text-[10px] text-3 font-mono">or drag any component from the left sidebar to start from scratch</p>
     </div>
   )
 }
 
-// Node types registered once outside render (useMemo handles referential stability inside)
 const NODE_TYPE_MAP = {
   client: ClientNode,
   gateway: GatewayNode,
@@ -117,7 +116,6 @@ function Canvas() {
   const nodeTypes = useMemo<NodeTypes>(() => NODE_TYPE_MAP, [])
   const edgeTypes = useMemo<EdgeTypes>(() => ({}), [])
 
-  // Load from URL on mount
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get('g')
     if (param) {
@@ -159,13 +157,11 @@ function Canvas() {
     [onConnect]
   )
 
-  // Compute which edge is highlighted during inspect
   const highlightedEdgeId = useMemo(() => {
     if (simStatus !== 'inspecting' || !inspectTrace) return null
     return inspectTrace[inspectStepIndex]?.edgeId ?? null
   }, [simStatus, inspectTrace, inspectStepIndex])
 
-  // Inject highlight class on edge
   const styledEdges: AppEdge[] = useMemo(() =>
     edges.map(e => ({
       ...e,
@@ -180,18 +176,8 @@ function Canvas() {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
-      {/* Elite gradient background — rendered behind ReactFlow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: [
-            'radial-gradient(ellipse 90% 70% at 70% 20%, rgba(88,28,235,0.055) 0%, transparent 65%)',
-            'radial-gradient(ellipse 60% 50% at 15% 80%, rgba(37,99,235,0.04) 0%, transparent 55%)',
-            'radial-gradient(ellipse 50% 40% at 85% 75%, rgba(16,185,129,0.025) 0%, transparent 50%)',
-            '#080810',
-          ].join(', '),
-        }}
-      />
+      {/* Themed gradient background */}
+      <div className="canvas-gradient" />
 
       <ReactFlow
         nodes={nodes as AppNode[]}
@@ -212,7 +198,7 @@ function Canvas() {
         maxZoom={2.5}
         defaultEdgeOptions={{
           type: 'default',
-          style: { stroke: 'rgba(255,255,255,0.18)', strokeWidth: 1.5 },
+          style: { stroke: 'var(--edge-stroke)', strokeWidth: 1.5 },
           animated: false,
         }}
         proOptions={{ hideAttribution: true }}
@@ -222,18 +208,14 @@ function Canvas() {
           variant={BackgroundVariant.Dots}
           gap={28}
           size={1.2}
-          color="rgba(255,255,255,0.1)"
+          color="rgba(255,255,255,0.08)"
         />
         <Controls showInteractive={false} position="bottom-right" />
       </ReactFlow>
 
-      {/* Packet animation canvas overlay */}
       <PacketOverlay />
-
-      {/* Reactive simulation observations */}
       <SimObserver />
 
-      {/* Empty state */}
       {nodes.length === 0 && <EmptyState />}
     </div>
   )
@@ -245,14 +227,14 @@ function App() {
   const isRunning = simStatus === 'running'
 
   return (
-    <div className="flex flex-col h-screen bg-[#0A0A0F] text-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-base text-1 overflow-hidden">
       <Toolbar />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left sidebar: palette + config panel */}
-        <aside className="w-[220px] flex-shrink-0 border-r border-white/8 flex flex-col bg-[#0A0A0F] overflow-hidden">
+        {/* Left sidebar */}
+        <aside className="w-[220px] flex-shrink-0 border-r border-ui flex flex-col bg-surface overflow-hidden">
           <Palette />
-          <div className="flex-1 border-t border-white/8 overflow-hidden">
+          <div className="flex-1 border-t border-ui overflow-hidden">
             <ConfigPanel />
           </div>
         </aside>
@@ -265,7 +247,6 @@ function App() {
             </div>
           </ReactFlowProvider>
 
-          {/* Bottom panel: metrics or inspect */}
           {isInspecting ? (
             <InspectPanel />
           ) : (isRunning && (

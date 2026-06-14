@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ExternalLink } from 'lucide-react'
 import { LEARN_CONTENT } from '../../data/learnContent'
 import type { NodeType } from '../../types'
 
@@ -10,14 +11,6 @@ const NODE_COLOR: Record<NodeType, string> = {
   cache:           '#EF4444',
   database:        '#F59E0B',
 }
-
-const ExternalIcon = () => (
-  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="flex-shrink-0">
-    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-    <polyline points="15 3 21 3 21 9" />
-    <line x1="10" y1="14" x2="21" y2="3" />
-  </svg>
-)
 
 interface Props {
   nodeType: NodeType
@@ -34,13 +27,13 @@ export function LearnPanel({ nodeType }: Props) {
     <div className="space-y-4 pb-4">
 
       {/* Tagline */}
-      <p className="text-[11px] text-white/60 leading-relaxed">
+      <p className="text-[11px] text-2 leading-relaxed">
         {content.tagline}
       </p>
 
       {/* Why section */}
       <Section label="Why it exists" color={color}>
-        <p className="text-[10.5px] text-white/50 leading-relaxed">
+        <p className="text-[10.5px] text-2 leading-relaxed">
           {content.why}
         </p>
       </Section>
@@ -77,21 +70,20 @@ export function LearnPanel({ nodeType }: Props) {
               style={
                 expandedConcept === c.label
                   ? { background: `${color}20`, borderColor: `${color}50`, color }
-                  : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)' }
+                  : { background: 'var(--bg-hover)', borderColor: 'var(--border)', color: 'var(--text-2)' }
               }
             >
               {c.label}
             </button>
           ))}
         </div>
-        {/* Expanded concept explanation */}
         {expandedConcept && (
           <div
             className="mt-2 rounded-lg p-2.5 text-[10px] leading-relaxed border"
             style={{
               background: `${color}0a`,
               borderColor: `${color}20`,
-              color: 'rgba(255,255,255,0.5)',
+              color: 'var(--text-2)',
             }}
           >
             {content.concepts.find(c => c.label === expandedConcept)?.tip}
@@ -105,7 +97,7 @@ export function LearnPanel({ nodeType }: Props) {
           {content.realWorld.map(item => (
             <span
               key={item}
-              className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.05] text-white/40 border border-white/[0.07]"
+              className="text-[9px] px-1.5 py-0.5 rounded bg-lift text-3 border border-ui"
             >
               {item}
             </span>
@@ -122,14 +114,14 @@ export function LearnPanel({ nodeType }: Props) {
               href={r.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-2 group rounded-lg p-2 -mx-1 hover:bg-white/[0.04] transition-colors"
+              className="flex items-start gap-2 group rounded-lg p-2 -mx-1 hover:bg-lift transition-colors"
             >
-              <ExternalIcon />
+              <ExternalLink size={9} strokeWidth={2.5} className="text-3 flex-shrink-0 mt-0.5" />
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] text-white/65 group-hover:text-white/85 transition-colors leading-snug">
+                <p className="text-[10px] text-2 group-hover:text-1 transition-colors leading-snug">
                   {r.title}
                 </p>
-                <p className="text-[9px] text-white/25 font-mono">{r.source}</p>
+                <p className="text-[9px] text-3 font-mono">{r.source}</p>
               </div>
             </a>
           ))}
@@ -145,7 +137,7 @@ function Section({ label, color, children }: { label: string; color: string; chi
     <div>
       <div className="flex items-center gap-2 mb-2">
         <div className="w-1 h-3 rounded-full flex-shrink-0" style={{ background: color }} />
-        <span className="text-[9px] font-semibold uppercase tracking-widest text-white/35">{label}</span>
+        <span className="text-[9px] font-semibold uppercase tracking-widest text-3">{label}</span>
       </div>
       {children}
     </div>

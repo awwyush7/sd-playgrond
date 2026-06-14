@@ -27,13 +27,13 @@ export function ConfigPanel() {
   if (!node) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-6 text-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2">
+        <div className="w-9 h-9 rounded-xl bg-lift flex items-center justify-center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-3">
             <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
             <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </div>
-        <p className="text-[10px] text-white/20 font-mono leading-relaxed">
+        <p className="text-[10px] text-3 font-mono leading-relaxed">
           Click a node to configure it<br />or tap Learn to explore concepts
         </p>
       </div>
@@ -43,16 +43,16 @@ export function ConfigPanel() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
 
-      {/* ── Node header ─────────────────────────────────────────────── */}
-      <div className="px-3 py-2.5 border-b border-white/[0.06] flex-shrink-0">
+      {/* Node header */}
+      <div className="px-3 py-2.5 border-b border-ui flex-shrink-0">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[9px] text-white/25 uppercase tracking-widest font-mono">
+          <span className="text-[9px] text-3 uppercase tracking-widest font-mono">
             {node.data.nodeType.replace('-', ' ')}
           </span>
           {!isActive && (
             <button
               onClick={() => removeNode(node.id)}
-              className="text-[9px] text-white/20 hover:text-red-400/80 transition-colors font-mono"
+              className="text-[9px] text-3 hover:text-red-400/80 transition-colors font-mono"
             >
               Delete
             </button>
@@ -63,13 +63,13 @@ export function ConfigPanel() {
           defaultValue={node.data.label}
           onBlur={e => updateNodeLabel(node.id, e.target.value.trim() || node.data.label)}
           onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
-          className="w-full bg-transparent text-[13px] font-semibold text-white/85 focus:outline-none focus:bg-white/[0.04] rounded px-1 -mx-1 py-0.5"
+          className="w-full bg-transparent text-[13px] font-semibold text-1 focus:outline-none focus:bg-lift rounded px-1 -mx-1 py-0.5"
           placeholder="Node name…"
         />
       </div>
 
-      {/* ── Tab switcher ────────────────────────────────────────────── */}
-      <div className="flex border-b border-white/[0.06] flex-shrink-0">
+      {/* Tab switcher */}
+      <div className="flex border-b border-ui flex-shrink-0">
         <TabBtn active={tab === 'config'} onClick={() => setTab('config')}>
           Configure
         </TabBtn>
@@ -78,12 +78,12 @@ export function ConfigPanel() {
         </TabBtn>
       </div>
 
-      {/* ── Content ─────────────────────────────────────────────────── */}
+      {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 py-3">
         {tab === 'config' ? (
           <>
             {isActive ? (
-              <p className="text-[10px] text-white/25 font-mono text-center py-6">
+              <p className="text-[10px] text-3 font-mono text-center py-6">
                 Stop the simulation to edit config
               </p>
             ) : (
@@ -102,9 +102,9 @@ export function ConfigPanel() {
         )}
       </div>
 
-      {/* ── Validation errors + architectural hints ─────────────────── */}
+      {/* Validation errors + architectural hints */}
       {validationErrors.length > 0 && (
-        <div className="border-t border-white/[0.06] px-3 py-2 space-y-1.5 flex-shrink-0">
+        <div className="border-t border-ui px-3 py-2 space-y-1.5 flex-shrink-0">
           {validationErrors.map(err => {
             const isHint = err.hint === true
             return (
@@ -137,8 +137,8 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
       onClick={onClick}
       className={`flex-1 py-2 text-[11px] font-medium transition-all duration-150 ${
         active
-          ? 'text-white/80 border-b-2 border-white/40 -mb-px'
-          : 'text-white/30 hover:text-white/55 border-b-2 border-transparent -mb-px'
+          ? 'text-1 border-b-2 border-[var(--text-2)] -mb-px'
+          : 'text-3 hover:text-2 border-b-2 border-transparent -mb-px'
       }`}
     >
       {children}
