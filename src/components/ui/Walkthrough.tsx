@@ -8,12 +8,20 @@ const PAD = 8
 type Rect = { x: number; y: number; w: number; h: number }
 
 export function Walkthrough() {
-  const { active, step, next, prev, skip } = useWalkthroughStore()
+  const { active, step, next, prev, skip, start } = useWalkthroughStore()
   const [rect, setRect] = useState<Rect | null>(null)
 
   const current = TOUR_STEPS[step]
   const isLast = step === TOUR_STEPS.length - 1
   const isFirst = step === 0
+
+  // Auto-start for first-time visitors
+  useEffect(() => {
+    if (!localStorage.getItem('sd-tour-seen')) {
+      const t = setTimeout(start, 600)
+      return () => clearTimeout(t)
+    }
+  }, [start])
 
   // Measure target element position
   useEffect(() => {

@@ -68,11 +68,15 @@ export const useWalkthroughStore = create<WalkthroughStore>((set, get) => ({
   next: () => {
     const { step } = get()
     if (step >= TOUR_STEPS.length - 1) {
+      localStorage.setItem('sd-tour-seen', '1')
       set({ active: false, step: 0 })
     } else {
       set({ step: step + 1 })
     }
   },
   prev: () => set(s => ({ step: Math.max(0, s.step - 1) })),
-  skip: () => set({ active: false, step: 0 }),
+  skip: () => {
+    localStorage.setItem('sd-tour-seen', '1')
+    set({ active: false, step: 0 })
+  },
 }))
