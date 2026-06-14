@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   Play, Square, ScanSearch, Share2, Trash2, ChevronDown,
-  Save, LayoutTemplate, AlertCircle, Sun, Moon, BookmarkPlus,
+  Save, LayoutTemplate, AlertCircle, Sun, Moon, BookmarkPlus, Compass,
 } from 'lucide-react'
 import { useGraphStore } from '../../stores/graphStore'
 import { useSimulationStore } from '../../stores/simulationStore'
 import { useThemeStore } from '../../stores/themeStore'
+import { useWalkthroughStore } from '../../stores/walkthroughStore'
 import { loadTemplate, TEMPLATES } from '../../utils/templates'
 import { cn } from '../../utils/cn'
 import type { SavedGraph } from '../../stores/graphStore'
@@ -44,6 +45,8 @@ export function Toolbar() {
 
   const theme       = useThemeStore(s => s.theme)
   const toggleTheme = useThemeStore(s => s.toggleTheme)
+
+  const startTour = useWalkthroughStore(s => s.start)
 
   const templateDD = useDropdown()
   const saveDD     = useDropdown()
@@ -104,16 +107,14 @@ export function Toolbar() {
     <div className="relative flex items-center gap-1 h-11 px-3 border-b border-ui bg-surface/95 backdrop-blur-md flex-shrink-0 z-20">
       {/* Brand */}
       <div className="flex items-center gap-2 mr-1.5 select-none flex-shrink-0">
-        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500 via-blue-500 to-cyan-500 flex items-center justify-center shadow-[0_0_12px_rgba(139,92,246,0.3)]">
-          <LayoutTemplate size={12} color="white" strokeWidth={2} />
-        </div>
+        <img src="/favicon.svg" alt="SD Playground" className="w-6 h-6" />
         <span className="text-[13px] font-semibold text-1 tracking-tight hidden sm:block">SD Playground</span>
       </div>
 
-      <div className="w-px h-4 bg-ui mx-1" />
+      <div className="w-px h-4 bg-[var(--border)] mx-1" />
 
       {/* Templates */}
-      <div className="relative" ref={templateDD.ref}>
+      <div className="relative" ref={templateDD.ref} data-tour="toolbar-templates">
         <Btn onClick={() => templateDD.setOpen(o => !o)} variant="ghost">
           <LayoutTemplate size={11} />
           <span>Templates</span>
@@ -164,10 +165,10 @@ export function Toolbar() {
         )}
       </div>
 
-      <div className="w-px h-4 bg-ui mx-1" />
+      <div className="w-px h-4 bg-[var(--border)] mx-1" />
 
       {/* Run / Stop */}
-      <div className="relative group">
+      <div className="relative group" data-tour="toolbar-run">
         <Btn onClick={handleRunToggle} disabled={!isRunning && !canRun} variant={isRunning ? 'danger' : 'primary'}>
           {isRunning ? <Square size={10} /> : <Play size={10} />}
           <span>{isRunning ? 'Stop' : 'Run'}</span>
@@ -202,15 +203,17 @@ export function Toolbar() {
       </div>
 
       {/* Inspect */}
-      <Btn onClick={handleInspectToggle} disabled={!isInspect && (!canRun || isRunning)} variant={isInspect ? 'warning' : 'ghost'}>
-        <ScanSearch size={11} />
-        <span>{isInspect ? 'Exit Inspect' : 'Inspect'}</span>
-      </Btn>
+      <div data-tour="toolbar-inspect">
+        <Btn onClick={handleInspectToggle} disabled={!isInspect && (!canRun || isRunning)} variant={isInspect ? 'warning' : 'ghost'}>
+          <ScanSearch size={11} />
+          <span>{isInspect ? 'Exit Inspect' : 'Inspect'}</span>
+        </Btn>
+      </div>
 
       {/* Speed control */}
       {isRunning && (
         <>
-          <div className="w-px h-4 bg-ui mx-1" />
+          <div className="w-px h-4 bg-[var(--border)] mx-1" />
           <div className="flex items-center gap-1 bg-lift rounded-lg px-1 py-1 border border-ui">
             {SPEEDS.map(s => (
               <button
@@ -249,7 +252,7 @@ export function Toolbar() {
                       onChange={e => setSaveName(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setSavePrompt(false) }}
                       placeholder="Graph name…"
-                      className="flex-1 bg-field border border-ui rounded-lg px-2 py-1 text-[11px] text-1 placeholder-text-3 focus:outline-none focus:border-violet-500/50"
+                      className="flex-1 bg-field border border-ui rounded-lg px-2 py-1 text-[11px] text-1 placeholder:text-3 focus:outline-none focus:border-violet-500/50"
                     />
                     <button onClick={handleSave} className="px-2 py-1 bg-violet-600/60 hover:bg-violet-600/80 text-white/90 rounded-lg text-[10px] font-medium transition-colors">Save</button>
                   </div>
@@ -305,7 +308,16 @@ export function Toolbar() {
         <span>Clear</span>
       </Btn>
 
-      <div className="w-px h-4 bg-ui mx-1" />
+      <div className="w-px h-4 bg-[var(--border)] mx-1" />
+
+      {/* Tour */}
+      <button
+        onClick={startTour}
+        className="w-7 h-7 rounded-lg flex items-center justify-center text-2 hover:text-1 hover:bg-lift transition-all"
+        title="Take a guided tour"
+      >
+        <Compass size={13} />
+      </button>
 
       {/* Theme toggle */}
       <button

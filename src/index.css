@@ -37,8 +37,8 @@
   --node-bg:       rgba(255, 255, 255, 0.82);
   --node-border:   rgba(0, 0, 0, 0.09);
   --handle-bg:     #e2e2ee;
-  --edge-stroke:   rgba(0, 0, 0, 0.14);
-  --edge-hover:    rgba(0, 0, 0, 0.35);
+  --edge-stroke:   rgba(0, 0, 0, 0.38);
+  --edge-hover:    rgba(0, 0, 0, 0.60);
   --scrollbar:     rgba(0, 0, 0, 0.09);
 }
 

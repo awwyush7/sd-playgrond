@@ -29,6 +29,7 @@ import { MetricsBar } from './components/ui/MetricsBar'
 import { InspectPanel } from './components/ui/InspectPanel'
 import { PacketOverlay } from './components/ui/PacketOverlay'
 import { SimObserver } from './components/ui/SimObserver'
+import { Walkthrough } from './components/ui/Walkthrough'
 
 import { loadTemplate } from './utils/templates'
 import type { NodeType, AppNode, AppEdge } from './types'
@@ -215,6 +216,7 @@ function Canvas() {
 
       <PacketOverlay />
       <SimObserver />
+      <Walkthrough />
 
       {nodes.length === 0 && <EmptyState />}
     </div>
@@ -233,8 +235,10 @@ function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left sidebar */}
         <aside className="w-[220px] flex-shrink-0 border-r border-ui flex flex-col bg-surface overflow-hidden">
-          <Palette />
-          <div className="flex-1 border-t border-ui overflow-hidden">
+          <div className="flex-shrink-0 overflow-y-auto" style={{ maxHeight: '55%' }}>
+            <Palette />
+          </div>
+          <div className="flex-1 border-t border-ui overflow-hidden min-h-0" data-tour="config-panel">
             <ConfigPanel />
           </div>
         </aside>
