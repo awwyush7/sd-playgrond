@@ -254,7 +254,7 @@ export function Toolbar() {
                       placeholder="Graph name…"
                       className="flex-1 bg-field border border-ui rounded-lg px-2 py-1 text-[11px] text-1 placeholder:text-3 focus:outline-none focus:border-violet-500/50"
                     />
-                    <button onClick={handleSave} className="px-2 py-1 bg-violet-600/60 hover:bg-violet-600/80 text-white/90 rounded-lg text-[10px] font-medium transition-colors">Save</button>
+                    <button onClick={handleSave} className="px-2 py-1 bg-[#7C6AF7]/60 hover:bg-[#7C6AF7]/80 text-white/90 rounded-lg text-[10px] font-medium transition-colors">Save</button>
                   </div>
                 ) : (
                   <button
@@ -348,7 +348,7 @@ function Btn({ onClick, disabled, variant = 'ghost', children }: BtnProps) {
         'disabled:opacity-30 disabled:cursor-not-allowed',
         variant === 'primary' && 'bg-emerald-500/12 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20',
         variant === 'danger'  && 'bg-red-500/12 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20',
-        variant === 'warning' && 'bg-violet-500/12 text-violet-600 dark:text-violet-400 border border-violet-500/20 hover:bg-violet-500/20',
+        variant === 'warning' && 'bg-[#7C6AF7]/12 text-[#7C6AF7] border border-[#7C6AF7]/20 hover:bg-[#7C6AF7]/20',
         variant === 'ghost'   && 'text-2 hover:text-1 hover:bg-lift',
       )}
     >

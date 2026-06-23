@@ -102,7 +102,7 @@ export function SimObserver() {
       className={`absolute bottom-4 left-4 max-w-[280px] rounded-xl border px-3 py-2.5 flex items-start gap-2 shadow-xl transition-all duration-500 z-10 ${KIND_STYLES[obs.kind]}`}
     >
       <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1 ${KIND_DOT[obs.kind]} ${obs.kind === 'warn' ? 'animate-pulse' : ''}`} />
-      <p className="text-[10px] leading-relaxed font-mono">{obs.text}</p>
+      <p className="text-[11px] leading-relaxed font-mono">{obs.text}</p>
     </div>
   )
 }

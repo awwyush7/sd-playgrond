@@ -29,6 +29,7 @@ import { MetricsBar } from './components/ui/MetricsBar'
 import { InspectPanel } from './components/ui/InspectPanel'
 import { PacketOverlay } from './components/ui/PacketOverlay'
 import { SimObserver } from './components/ui/SimObserver'
+import { SimInsight } from './components/ui/SimInsight'
 import { Walkthrough } from './components/ui/Walkthrough'
 
 import { loadTemplate } from './utils/templates'
@@ -57,35 +58,27 @@ function TemplateCard({ id, name, badge, badgeColor, desc }: typeof STARTER_TEMP
     >
       <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded self-start ${badgeColor}`}>{badge}</span>
       <p className="text-[12px] font-semibold text-1">{name}</p>
-      <p className="text-[10px] text-3 font-mono leading-relaxed">{desc}</p>
+      <p className="text-[11px] text-3 font-mono leading-relaxed">{desc}</p>
     </button>
   )
 }
 
+const ALL_TEMPLATES = [...STARTER_TEMPLATES, ...SCENARIO_TEMPLATES]
+
 function EmptyState() {
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 select-none">
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 select-none">
       <div className="text-center">
         <p className="text-[11px] text-3 font-mono uppercase tracking-widest mb-1">System Design Playground</p>
         <p className="text-[22px] font-bold text-1 leading-tight">Watch distributed systems come alive.</p>
-        <p className="text-[13px] text-2 mt-1">Wire nodes, configure routes, run a simulation — see how real architectures behave.</p>
+        <p className="text-[13px] text-2 mt-1.5">Wire nodes, configure routes, run a simulation — see how real architectures behave.</p>
       </div>
 
-      <div className="flex flex-col items-center gap-2">
-        <p className="text-[9px] text-3 uppercase tracking-widest font-mono">Start with a template</p>
-        <div className="flex items-stretch gap-2.5">
-          {STARTER_TEMPLATES.map(t => <TemplateCard key={t.id} {...t} />)}
-        </div>
+      <div className="flex flex-wrap items-stretch gap-2.5 justify-center max-w-[560px]">
+        {ALL_TEMPLATES.map(t => <TemplateCard key={t.id} {...t} />)}
       </div>
 
-      <div className="flex flex-col items-center gap-2">
-        <p className="text-[9px] text-3 uppercase tracking-widest font-mono">or try a failure scenario</p>
-        <div className="flex items-stretch gap-2.5">
-          {SCENARIO_TEMPLATES.map(t => <TemplateCard key={t.id} {...t} />)}
-        </div>
-      </div>
-
-      <p className="text-[10px] text-3 font-mono">or drag any component from the left sidebar to start from scratch</p>
+      <p className="text-[10px] text-3 font-mono">or drag any component from the left panel</p>
     </div>
   )
 }
@@ -215,6 +208,7 @@ function Canvas() {
 
       <PacketOverlay />
       <SimObserver />
+      <SimInsight />
       <Walkthrough />
 
       {nodes.length === 0 && <EmptyState />}

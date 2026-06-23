@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import { useGraphStore } from '../../stores/graphStore'
 import { useSimulationStore } from '../../stores/simulationStore'
 import type { NodeType } from '../../types'
@@ -64,9 +66,9 @@ export function MetricsBar() {
 
       {/* Global counters */}
       <div className="ml-auto flex items-center gap-5 px-5 border-l border-ui flex-shrink-0">
-        <GlobalCounter label="Completed" value={completedCount} color="#22C55E" symbol="✓" />
+        <GlobalCounter label="Completed" value={completedCount} color="#4ADE80" icon={<CheckCircle2 size={12} />} />
         <div className="w-px h-7 bg-[var(--border)]" />
-        <GlobalCounter label="Dropped"   value={droppedCount}   color="#F97316" symbol="✕" />
+        <GlobalCounter label="Dropped"   value={droppedCount}   color="#FB923C" icon={<XCircle size={12} />} />
       </div>
     </div>
   )
@@ -99,18 +101,18 @@ function Stat({
   )
 }
 
-function GlobalCounter({ label, value, color, symbol }: {
-  label: string; value: number; color: string; symbol: string
+function GlobalCounter({ label, value, color, icon }: {
+  label: string; value: number; color: string; icon: ReactNode
 }) {
   return (
     <div className="flex flex-col items-center gap-0.5 min-w-[56px]">
       <div className="flex items-center gap-1.5">
-        <span className="text-[12px] font-bold" style={{ color }}>{symbol}</span>
+        <span style={{ color, opacity: 0.7 }}>{icon}</span>
         <span className="text-[20px] font-bold font-mono tabular-nums leading-none" style={{ color }}>
           {value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value}
         </span>
       </div>
-      <span className="text-[8px] text-3 font-mono uppercase tracking-wide">{label}</span>
+      <span className="text-[9px] text-3 font-mono uppercase tracking-wide">{label}</span>
     </div>
   )
 }

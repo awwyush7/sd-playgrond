@@ -44,8 +44,8 @@ export function BaseNode({
     <div
       className={cn(
         'relative min-w-[148px] rounded-xl border backdrop-blur-sm transition-all duration-200 cursor-pointer select-none node-bg node-border',
-        selected && 'ring-2 ring-violet-400/50',
-        isInspectHighlighted && 'ring-2 ring-violet-400 shadow-[0_0_16px_rgba(139,92,246,0.4)]',
+        selected && 'ring-2 ring-[#7C6AF7]/50',
+        isInspectHighlighted && 'ring-2 ring-[#7C6AF7] shadow-[0_0_16px_rgba(124,106,247,0.4)]',
         hasError && '!border-red-500/50',
         status === 'active' && 'node-active',
         status === 'error'  && 'node-error',
@@ -90,12 +90,10 @@ export function BaseNode({
       </div>
 
       {(hasTarget || showBothHandles) && (
-        <Handle type="target" position={Position.Left}
-          className="!w-2.5 !h-2.5 !border-2 !border-[var(--node-border)] !bg-[var(--handle-bg)] transition-colors" />
+        <Handle type="target" position={Position.Left} />
       )}
       {(hasSource || showBothHandles) && (
-        <Handle type="source" position={Position.Right}
-          className="!w-2.5 !h-2.5 !border-2 !border-[var(--node-border)] !bg-[var(--handle-bg)] transition-colors" />
+        <Handle type="source" position={Position.Right} />
       )}
     </div>
   )
@@ -105,7 +103,7 @@ function MetricItem({ label, value }: { label: string; value: string | number })
   return (
     <div className="flex gap-1 items-baseline">
       <span className="text-[9px] text-3 font-mono uppercase">{label}</span>
-      <span className="text-[10px] text-2 font-mono">{value}</span>
+      <span className="text-[10px] text-2 font-mono tabular-nums">{value}</span>
     </div>
   )
 }

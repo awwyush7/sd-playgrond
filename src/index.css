@@ -16,7 +16,7 @@
   --text-2:        rgba(255, 255, 255, 0.52);
   --text-3:        rgba(255, 255, 255, 0.30);
   --node-bg:       rgba(255, 255, 255, 0.04);
-  --node-border:   rgba(255, 255, 255, 0.10);
+  --node-border:   rgba(255, 255, 255, 0.07);
   --handle-bg:     #1a1a2a;
   --edge-stroke:   rgba(255, 255, 255, 0.12);
   --edge-hover:    rgba(255, 255, 255, 0.32);
@@ -96,9 +96,9 @@ html, body, #root {
 }
 
 .react-flow__edge--highlighted .react-flow__edge-path {
-  stroke: #8B5CF6 !important;
+  stroke: #7C6AF7 !important;
   stroke-width: 2.5 !important;
-  filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.6));
+  filter: drop-shadow(0 0 5px rgba(124, 106, 247, 0.6));
 }
 
 .react-flow__connection-path {
@@ -149,8 +149,14 @@ html, body, #root {
 .react-flow__controls-button svg { fill: currentColor; }
 
 .react-flow__selection {
-  background: rgba(139, 92, 246, 0.06);
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: rgba(124, 106, 247, 0.06);
+  border: 1px solid rgba(124, 106, 247, 0.35);
+}
+
+/* ─── Node shell ─────────────────────────────────────────────────────────────── */
+
+.react-flow__node > div {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 /* ─── Node animations ────────────────────────────────────────────────────────── */

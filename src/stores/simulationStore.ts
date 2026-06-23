@@ -12,6 +12,12 @@ import { createSimulationTick } from '../simulation/engine'
 import { buildTrace } from '../simulation/inspector'
 import { useGraphStore } from './graphStore'
 
+export interface FinalSnapshot {
+  completedCount: number
+  droppedCount: number
+  metrics: Map<string, NodeMetrics>
+}
+
 interface SimulationState {
   status: SimulationStatus
   packets: Map<string, Packet>
@@ -22,6 +28,7 @@ interface SimulationState {
   inspectTrace: TraceStep[] | null
   inspectStepIndex: number
   tickIntervalRef: ReturnType<typeof setInterval> | null
+  finalSnapshot: FinalSnapshot | null
 }
 
 interface SimulationActions {
@@ -50,6 +57,7 @@ export const useSimulationStore = create<SimulationStore>()(
     inspectTrace: null,
     inspectStepIndex: 0,
     tickIntervalRef: null,
+    finalSnapshot: null,
 
     startSimulation: () => {
       const existing = get().tickIntervalRef
@@ -75,15 +83,21 @@ export const useSimulationStore = create<SimulationStore>()(
         metrics: new Map(),
         completedCount: 0,
         droppedCount: 0,
+        finalSnapshot: null,
       })
     },
 
     stopSimulation: () => {
-      const { tickIntervalRef } = get()
+      const { tickIntervalRef, completedCount, droppedCount, metrics } = get()
       if (tickIntervalRef !== null) {
         clearInterval(tickIntervalRef)
       }
-      set({ status: 'idle', tickIntervalRef: null, packets: new Map(), metrics: new Map(), completedCount: 0, droppedCount: 0 })
+      const snapshot: FinalSnapshot = {
+        completedCount,
+        droppedCount,
+        metrics: new Map(metrics),
+      }
+      set({ status: 'idle', tickIntervalRef: null, packets: new Map(), metrics: new Map(), completedCount: 0, droppedCount: 0, finalSnapshot: snapshot })
     },
 
     startInspect: () => {
